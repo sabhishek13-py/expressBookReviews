@@ -1,55 +1,194 @@
+const express = require("express");
 const axios = require("axios");
 
-const BASE_URL = "http://localhost:5000";
+const router = express.Router();
 
-// 1. Get all books
-async function getAllBooks() {
-    try {
-        const response = await axios.get(`${BASE_URL}/`);
-        console.log("All Books:");
-        console.log(response.data);
-    } catch (error) {
-        console.error(error.message);
+const DESTINATIONS = [
+  {
+    id: 1,
+    city: "Goa",
+    country: "India",
+    category: "Beach",
+    rating: 4.8
+  },
+  {
+    id: 2,
+    city: "Manali",
+    country: "India",
+    category: "Mountain",
+    rating: 4.7
+  },
+  {
+    id: 3,
+    city: "Tokyo",
+    country: "Japan",
+    category: "City",
+    rating: 4.9
+  }
+];
+
+/*
+------------------------------------
+Retrieve all destinations
+------------------------------------
+*/
+
+router.get("/", async (req, res) => {
+  try {
+    const response = await axios.get("http://localhost:5000/api/destinations");
+
+    if (response.status === 200) {
+      return res.status(200).json(response.data);
     }
-}
 
-// 2. Get book by ISBN
-async function getBookByISBN(isbn) {
-    try {
-        const response = await axios.get(`${BASE_URL}/isbn/${isbn}`);
-        console.log("Book by ISBN:");
-        console.log(response.data);
-    } catch (error) {
-        console.error(error.message);
+    return res.status(404).json({
+      message: "No destinations found"
+    });
+
+  } catch (error) {
+    return res.status(500).json({
+      message: "Internal Server Error",
+      error: error.message
+    });
+  }
+});
+
+/*
+------------------------------------
+Retrieve destination by ID
+------------------------------------
+*/
+
+router.get("/id/:id", async (req, res) => {
+
+  try {
+
+    const id = req.params.id;
+
+    const response = await axios.get(
+      `http://localhost:5000/api/destinations/id/${id}`
+    );
+
+    if (response.status === 200) {
+      return res.status(200).json(response.data);
     }
-}
 
-// 3. Get books by author
-async function getBooksByAuthor(author) {
-    try {
-        const response = await axios.get(`${BASE_URL}/author/${author}`);
-        console.log("Books by Author:");
-        console.log(response.data);
-    } catch (error) {
-        console.error(error.message);
+    return res.status(404).json({
+      message: "Destination not found"
+    });
+
+  } catch (error) {
+
+    return res.status(500).json({
+      message: "Internal Server Error",
+      error: error.message
+    });
+
+  }
+
+});
+
+/*
+------------------------------------
+Retrieve destinations by country
+------------------------------------
+*/
+
+router.get("/country/:country", async (req, res) => {
+
+  try {
+
+    const country = req.params.country;
+
+    const response = await axios.get(
+      `http://localhost:5000/api/destinations/country/${country}`
+    );
+
+    if (response.status === 200) {
+      return res.status(200).json(response.data);
     }
-}
 
-// 4. Get books by title
-async function getBooksByTitle(title) {
-    try {
-        const response = await axios.get(`${BASE_URL}/title/${title}`);
-        console.log("Books by Title:");
-        console.log(response.data);
-    } catch (error) {
-        console.error(error.message);
+    return res.status(404).json({
+      message: "Country not found"
+    });
+
+  } catch (error) {
+
+    return res.status(500).json({
+      message: "Internal Server Error",
+      error: error.message
+    });
+
+  }
+
+});
+
+/*
+------------------------------------
+Retrieve destinations by category
+------------------------------------
+*/
+
+router.get("/category/:category", async (req, res) => {
+
+  try {
+
+    const category = req.params.category;
+
+    const response = await axios.get(
+      `http://localhost:5000/api/destinations/category/${category}`
+    );
+
+    if (response.status === 200) {
+      return res.status(200).json(response.data);
     }
-}
 
-// Run all methods
-(async () => {
-    await getAllBooks();
-    await getBookByISBN("1");
-    await getBooksByAuthor("Chinua Achebe");
-    await getBooksByTitle("Things Fall Apart");
-})();
+    return res.status(404).json({
+      message: "Category not found"
+    });
+
+  } catch (error) {
+
+    return res.status(500).json({
+      message: "Internal Server Error",
+      error: error.message
+    });
+
+  }
+
+});
+
+/*
+------------------------------------
+Top Rated Destinations
+------------------------------------
+*/
+
+router.get("/top-rated", async (req, res) => {
+
+  try {
+
+    const response = await axios.get(
+      "http://localhost:5000/api/destinations/top-rated"
+    );
+
+    if (response.status === 200) {
+      return res.status(200).json(response.data);
+    }
+
+    return res.status(404).json({
+      message: "No destinations available"
+    });
+
+  } catch (error) {
+
+    return res.status(500).json({
+      message: "Internal Server Error",
+      error: error.message
+    });
+
+  }
+
+});
+
+module.exports = router;
